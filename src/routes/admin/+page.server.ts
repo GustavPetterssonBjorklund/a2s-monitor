@@ -1,6 +1,6 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import { env } from '$env/dynamic/private';
-import { fail } from '@sveltejs/kit';
+import { fail, redirect } from '@sveltejs/kit';
 import { refreshEnabledServices, refreshServiceById } from '$lib/server/a2s';
 import { prisma } from '$lib/server/db';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
@@ -138,7 +138,7 @@ export const actions: Actions = {
 	logout: async (event) => {
 		event.cookies.delete(ADMIN_COOKIE, { path: '/' });
 
-		return { message: 'Logged out.' };
+		redirect(303, '/');
 	},
 	createProject: async (event) => {
 		const authFailure = requireAdmin(event);
