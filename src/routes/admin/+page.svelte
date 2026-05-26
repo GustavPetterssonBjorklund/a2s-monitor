@@ -74,31 +74,62 @@
 				<div>
 					<h2 class="text-lg font-semibold text-zinc-950">Create project</h2>
 					<p class="mt-2 max-w-2xl text-sm text-zinc-600">
-						Projects group services on the public display page.
+						Projects group services on the public display page. You can also rebuild a project from
+						an exported JSON file.
 					</p>
 				</div>
 
-				<form class="grid gap-3 bg-white p-4 shadow-sm" method="POST" action="?/createProject">
-					<label class="grid gap-1 text-sm font-medium text-zinc-800">
-						Name
-						<input class="h-10 rounded-md border-zinc-300 bg-white text-sm" name="name" required />
-					</label>
+				<div class="grid gap-4">
+					<form class="grid gap-3 bg-white p-4 shadow-sm" method="POST" action="?/createProject">
+						<label class="grid gap-1 text-sm font-medium text-zinc-800">
+							Name
+							<input
+								class="h-10 rounded-md border-zinc-300 bg-white text-sm"
+								name="name"
+								required
+							/>
+						</label>
 
-					<label class="grid gap-1 text-sm font-medium text-zinc-800">
-						Description
-						<textarea
-							class="min-h-20 rounded-md border-zinc-300 bg-white text-sm"
-							name="description"
-						></textarea>
-					</label>
+						<label class="grid gap-1 text-sm font-medium text-zinc-800">
+							Description
+							<textarea
+								class="min-h-20 rounded-md border-zinc-300 bg-white text-sm"
+								name="description"
+							></textarea>
+						</label>
 
-					<button
-						class="inline-flex h-10 items-center justify-center rounded-md bg-emerald-700 px-4 text-sm font-medium text-white hover:bg-emerald-800"
-						type="submit"
+						<button
+							class="inline-flex h-10 items-center justify-center rounded-md bg-emerald-700 px-4 text-sm font-medium text-white hover:bg-emerald-800"
+							type="submit"
+						>
+							Create project
+						</button>
+					</form>
+
+					<form
+						class="grid gap-3 bg-white p-4 shadow-sm"
+						enctype="multipart/form-data"
+						method="POST"
+						action="?/importProject"
 					>
-						Create project
-					</button>
-				</form>
+						<label class="grid gap-1 text-sm font-medium text-zinc-800">
+							Import project JSON
+							<input
+								accept="application/json,.json"
+								class="rounded-md border border-zinc-300 bg-white text-sm file:mr-3 file:h-10 file:border-0 file:bg-zinc-100 file:px-4 file:text-sm file:font-medium file:text-zinc-900"
+								name="projectJson"
+								required
+								type="file"
+							/>
+						</label>
+						<button
+							class="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-900 hover:bg-zinc-100"
+							type="submit"
+						>
+							Rebuild from JSON
+						</button>
+					</form>
+				</div>
 			</section>
 
 			<div class="flex justify-end">
@@ -154,6 +185,13 @@
 								</form>
 
 								<div class="grid content-start gap-3 bg-white p-4 shadow-sm">
+									<a
+										class="inline-flex h-10 items-center justify-center rounded-md border border-zinc-300 px-4 text-sm font-medium text-zinc-900 hover:bg-zinc-100"
+										href={resolve(`/admin/projects/${project.id}/export.json`)}
+									>
+										Download JSON
+									</a>
+
 									<form class="grid gap-3" method="POST" action="?/createService">
 										<input name="projectId" type="hidden" value={project.id} />
 										<h3 class="text-sm font-semibold text-zinc-950">Add service</h3>

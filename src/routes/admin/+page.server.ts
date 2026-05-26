@@ -1,35 +1,10 @@
-import { createHash, timingSafeEqual } from 'node:crypto';
 import { env } from '$env/dynamic/private';
 import { fail, redirect } from '@sveltejs/kit';
+import { ADMIN_COOKIE, adminToken, isAdmin } from '$lib/server/admin-auth';
 import { refreshEnabledServices, refreshServiceById } from '$lib/server/a2s';
 import { prisma } from '$lib/server/db';
+import { rebuildProjectFromJson } from '$lib/server/project-json';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
-
-const ADMIN_COOKIE = 'a2s_admin';
-
-function adminToken() {
-	const password = env.ADMIN_PASSWORD;
-
-	if (!password) {
-		return null;
-	}
-
-	return createHash('sha256').update(`a2s-admin:${password}`).digest('hex');
-}
-
-function constantTimeEquals(left: string, right: string) {
-	const leftBuffer = Buffer.from(left);
-	const rightBuffer = Buffer.from(right);
-
-	return leftBuffer.length === rightBuffer.length && timingSafeEqual(leftBuffer, rightBuffer);
-}
-
-function isAdmin(event: RequestEvent) {
-	const token = adminToken();
-	const cookie = event.cookies.get(ADMIN_COOKIE);
-
-	return Boolean(token && cookie && constantTimeEquals(cookie, token));
-}
 
 function requireAdmin(event: RequestEvent) {
 	if (!isAdmin(event)) {
@@ -194,6 +169,30 @@ export const actions: Actions = {
 		});
 
 		return { message: 'Project removed.' };
+	},
+	importProject: async (event) => {
+		const authFailure = requireAdmin(event);
+		if (authFailure) return authFailure;
+
+		const formData = await event.request.formData();
+		const upload = formData.get('projectJson');
+
+		if (!(upload instanceof File) || upload.size === 0) {
+			return fail(400, { message: 'Choose a project JSON file to import.' });
+		}
+
+		try {
+			const contents = await upload.text();
+			const parsed = JSON.parse(contents) as unknown;
+			const project = await rebuildProjectFromJson(parsed);
+
+			return { message: `Project "${project.name}" imported.` };
+		} catch (error) {
+			const message =
+				error instanceof Error ? error.message : 'Project JSON could not be imported.';
+
+			return fail(400, { message });
+		}
 	},
 	createService: async (event) => {
 		const authFailure = requireAdmin(event);
