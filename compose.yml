@@ -11,7 +11,7 @@ services:
       HOST: 0.0.0.0
       PORT: 3000
       DATABASE_URL: file:/data/prod.db
-      ADMIN_PASSWORD: change-me
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env before running docker compose}
     volumes:
       - a2s-data:/data
 

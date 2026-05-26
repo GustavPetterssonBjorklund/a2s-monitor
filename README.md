@@ -40,3 +40,15 @@ npm run build
 You can preview the production build with `npm run preview`.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+
+## Docker Compose
+
+Create a `.env` file before starting the production compose deployment:
+
+```sh
+cp .env.example .env
+# edit ADMIN_PASSWORD in .env
+docker compose up -d --build
+```
+
+`compose.yml` requires `ADMIN_PASSWORD` so the deployed admin login uses your configured password instead of a placeholder.
