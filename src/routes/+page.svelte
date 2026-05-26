@@ -42,13 +42,15 @@
 </svelte:head>
 
 <main class="min-h-screen bg-zinc-100 text-zinc-950">
-	<div class="mx-auto flex w-full max-w-7xl flex-col gap-8 px-5 py-6 sm:px-8">
+	<div class="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-5 sm:gap-8 sm:px-8 sm:py-6">
 		<header
 			class="flex flex-col gap-4 border-b border-zinc-300 pb-5 lg:flex-row lg:items-end lg:justify-between"
 		>
 			<div>
 				<p class="text-sm font-medium tracking-wide text-emerald-700 uppercase">A2S Monitor</p>
-				<h1 class="mt-1 text-3xl font-semibold tracking-normal text-zinc-950">Projects</h1>
+				<h1 class="mt-1 text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl">
+					Projects
+				</h1>
 			</div>
 
 			<div class="flex flex-col items-start gap-2">
@@ -68,10 +70,10 @@
 		{:else}
 			<section class="grid gap-8">
 				{#each data.projects as project (project.id)}
-					<article class="grid gap-4 border-b border-zinc-300 pb-8">
+					<article class="grid gap-4 border-b border-zinc-300 pb-6 sm:pb-8">
 						<div class="flex flex-col gap-2 lg:flex-row lg:items-start lg:justify-between">
 							<div>
-								<h2 class="text-xl font-semibold text-zinc-950">{project.name}</h2>
+								<h2 class="text-lg font-semibold text-zinc-950 sm:text-xl">{project.name}</h2>
 								{#if project.description}
 									<p class="mt-1 max-w-3xl text-sm text-zinc-600">{project.description}</p>
 								{/if}
@@ -81,7 +83,42 @@
 						{#if project.services.length === 0}
 							<p class="bg-white px-4 py-3 text-sm text-zinc-600 shadow-sm">No services.</p>
 						{:else}
-							<div class="overflow-x-auto bg-white shadow-sm">
+							<div class="grid gap-3 md:hidden">
+								{#each project.services as service (service.id)}
+									<div class="bg-white p-4 text-sm shadow-sm">
+										<div class="flex items-start justify-between gap-3">
+											<div class="min-w-0">
+												<h3 class="truncate font-medium text-zinc-950">{service.name}</h3>
+											</div>
+											<span
+												class={[
+													'shrink-0 rounded px-2 py-1 text-xs font-semibold',
+													service.online
+														? 'bg-emerald-100 text-emerald-800'
+														: 'bg-red-100 text-red-800'
+												]}
+											>
+												{service.online ? 'Online' : 'Offline'}
+											</span>
+										</div>
+
+										<dl class="mt-4 grid grid-cols-2 gap-x-4">
+											<div>
+												<dt class="text-xs font-medium text-zinc-500 uppercase">Map</dt>
+												<dd class="mt-1 break-words text-zinc-700">{service.map ?? 'Unknown'}</dd>
+											</div>
+											<div>
+												<dt class="text-xs font-medium text-zinc-500 uppercase">Players</dt>
+												<dd class="mt-1 text-zinc-700">
+													{service.players ?? '-'} / {service.maxPlayers ?? '-'}
+												</dd>
+											</div>
+										</dl>
+									</div>
+								{/each}
+							</div>
+
+							<div class="hidden overflow-x-auto bg-white shadow-sm md:block">
 								<table class="min-w-full divide-y divide-zinc-200 text-left text-sm">
 									<thead class="bg-zinc-50 text-xs text-zinc-600 uppercase">
 										<tr>
