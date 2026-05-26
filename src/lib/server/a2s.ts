@@ -1,7 +1,18 @@
 import { GameDig } from 'gamedig';
+import { env } from '$env/dynamic/private';
 import { prisma } from '$lib/server/db';
 
-const QUERY_TIMEOUT_MS = 2000;
+const DEFAULT_QUERY_TIMEOUT_MS = 5000;
+
+function queryTimeoutMs() {
+	const parsed = Number.parseInt(env.A2S_QUERY_TIMEOUT_MS ?? '', 10);
+
+	if (!Number.isInteger(parsed) || parsed < 1) {
+		return DEFAULT_QUERY_TIMEOUT_MS;
+	}
+
+	return parsed;
+}
 
 type ServiceTarget = {
 	id: number;
@@ -20,14 +31,15 @@ function toErrorMessage(error: unknown) {
 
 export async function refreshService(service: ServiceTarget) {
 	try {
+		const timeoutMs = queryTimeoutMs();
 		const gameDig = new GameDig();
 		const info = await gameDig.query({
 			type: 'ase',
 			host: service.host,
 			port: service.queryPort ?? service.port,
 			givenPortOnly: true,
-			socketTimeout: QUERY_TIMEOUT_MS,
-			attemptTimeout: QUERY_TIMEOUT_MS * 2,
+			socketTimeout: timeoutMs,
+			attemptTimeout: timeoutMs * 2,
 			requestPlayers: false,
 			requestRules: false
 		});
